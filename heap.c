@@ -5,7 +5,6 @@
 
 #include "heap.h"
 
-#define KEY_NOT_PRESENT -1
 
 heap_t *heap_create(int capacity) {
     heap_t *heap = malloc(sizeof(heap_t));
@@ -107,4 +106,45 @@ heap_value_t heap_remove_min(heap_t *heap) {
     heap_bubble_down(heap, 0);
 
     return min;
+}
+
+unsigned int heap_find_key_index(heap_t *heap, heap_key_t aKey) {
+    for (unsigned int ix = 0; ix < heap_size(heap); ix++) {
+        if (heap->data[ix].key == aKey) {
+            return ix;
+        }
+    }
+    return KEY_NOT_PRESENT;
+}
+
+heap_value_t heap_find_key(heap_t *heap, heap_key_t aKey) {
+    int index = heap_find_key_index(heap, aKey);
+    if (index == KEY_NOT_PRESENT) {
+        return (heap_value_t){.as_int = KEY_NOT_PRESENT};
+    }
+    return heap->data[index].value;
+}
+
+void heap_update_key(heap_t *heap, heap_key_t old_key, heap_key_t new_key) {
+    int index = heap_find_key_index(heap, old_key);
+    if (index == KEY_NOT_PRESENT) {
+        return;
+    }
+
+    heap->data[index].key = new_key;
+
+    if (new_key < old_key) {
+        heap_bubble_up(heap, index);
+    } else {
+        heap_bubble_down(heap, index);
+    }
+
+}
+void heap_update_value(heap_t *heap, heap_key_t key, heap_value_t new_data) {
+    int index = heap_find_key_index(heap, key);
+    if (index == KEY_NOT_PRESENT) {
+        return;
+    }
+
+    heap->data[index].value = new_data;
 }
